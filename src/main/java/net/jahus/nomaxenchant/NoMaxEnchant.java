@@ -8,8 +8,11 @@ public class NoMaxEnchant implements ModInitializer {
     public static final String MOD_ID = "nomaxenchant";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    public static NoMaxEnchantConfig CONFIG;
+
     @Override
     public void onInitialize() {
-        LOGGER.info("Anvil enchantment level cap has been removed!");
+        CONFIG = NoMaxEnchantConfig.load();
+        LOGGER.info("Anvil enchantment level cap has been removed! (globalCap={}, {} per-enchantment override(s))", CONFIG.globalCap, CONFIG.perEnchantment.size());
     }
 }
