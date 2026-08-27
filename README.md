@@ -6,6 +6,12 @@ Vanilla always clamps an enchantment's result on an anvil to its own `getMaxLeve
 
 **NoMaxEnchant** removes that clamp. Whatever level the anvil calculation would naturally produce is what applies, up to a hard [ceiling of 255](https://bugs.mojang.com/browse/MC/issues/MC-252460).
 
+## Environment
+**Server-side only.** The mod only needs to run on the server; the anvil calculation it patches is server-authoritative.
+
+## Known limitations
+**Anvil only.** Any other way an enchantment's level could be set (commands, other mods' custom enchanting mechanics) isn't affected.
+
 ## Mechanics
 - **Target**: only the anvil's enchantment level calculation (`updateResult`). Nothing else about anvil behavior (repair cost, item name, XP cost, slots) is touched.
 - **Default behavior**: with no configuration (`"globalCap": -1`, empty `perEnchantment`), the mod does nothing observable. It returns `vanillaMax` unchanged, exactly what `getMaxLevel()` would have returned anyway. The clamp only starts doing something once `globalCap` or a `perEnchantment` entry is set.
@@ -13,6 +19,12 @@ Vanilla always clamps an enchantment's result on an anvil to its own `getMaxLeve
 - **Per-enchantment cap**: an optional override for individual enchantments, by their id (e.g. `minecraft:sharpness`), taking priority over the global cap.
 - **Hard ceiling**: no enchantment can ever exceed level 255, regardless of configuration. This isn't a design choice, it's a Minecraft engine limit ([MC-231508](https://bugs.mojang.com/browse/MC-231508)).
 - **Level 1 enchantments**: enchantments whose max is already 1 are left untouched (nothing to uncap).
+
+## Vanilla effective max levels
+
+Minecraft has hard internal limits on how high most enchantments can usefully go. Raising a level past these points produces no additional effect in-game (or can even break the mechanic, as with Lure or Quick Charge).
+
+The full reference is available in **[vanilla.md](vanilla.md)**; complete table of every vanilla enchantment that scales past its normal maximum, with explanations.
 
 ## Configuration
 On first run, NoMaxEnchant writes `config/nomaxenchant.json`:
@@ -31,11 +43,14 @@ On first run, NoMaxEnchant writes `config/nomaxenchant.json`:
 
 If the config file is missing, empty or fails to parse, NoMaxEnchant falls back to vanilla behavior (no cap changes) and logs a warning; it never crashes the server over a bad config file.
 
-## Environment
-**Server-side only.** The mod only needs to run on the server; the anvil calculation it patches is server-authoritative.
+### Example configuration
 
-## Known limitations
-**Anvil only.** Any other way an enchantment's level could be set (commands, other mods' custom enchanting mechanics) isn't affected.
+[`vanilla.json`](vanilla.json) is a ready-to-use config that sets every vanilla enchantment to its **true effective maximum**.
+
+You can:
+- Copy it directly as `./config/nomaxenchant.json`
+- Use it as a base
+- Add entries for modded enchantments
 
 ## Licence
 [Apache 2.0 Licence](/LICENSE.md)
