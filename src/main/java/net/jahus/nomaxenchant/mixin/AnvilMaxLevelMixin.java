@@ -17,7 +17,10 @@ public class AnvilMaxLevelMixin {
         )
     )
     private int nomaxenchant$removeMaxLevelClamp(Enchantment enchantment) {
-        return Integer.MAX_VALUE;
+        int vanillaMax = enchantment.getMaxLevel();
+        if (vanillaMax == 1) {
+            return 1;
+        }
         return 255;
     }
 }
