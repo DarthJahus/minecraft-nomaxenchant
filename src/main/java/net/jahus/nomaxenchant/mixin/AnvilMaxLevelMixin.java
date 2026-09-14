@@ -1,5 +1,6 @@
 package net.jahus.nomaxenchant.mixin;
 
+import net.jahus.nomaxenchant.EffectiveMaxLevel;
 import net.jahus.nomaxenchant.NoMaxEnchant;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerInventory;
@@ -25,8 +26,6 @@ public abstract class AnvilMaxLevelMixin extends ForgingScreenHandler {
         super(type, syncId, playerInventory, context, forgingSlotsManager);
     }
 
-    private static final int HARD_CAP = 255; // MC-231508: enchant levels are capped at 255
-
     @Redirect(
         method = "updateResult",
         at = @At(
@@ -36,24 +35,8 @@ public abstract class AnvilMaxLevelMixin extends ForgingScreenHandler {
     )
     private int nomaxenchant$removeMaxLevelClamp(Enchantment enchantment) {
         int vanillaMax = enchantment.getMaxLevel();
-
-        if (vanillaMax == 1) {
-            return 1;
-        }
-
         Identifier id = nomaxenchant$resolveId(enchantment);
-        String key = id != null ? id.toString() : null;
-
-        if (key != null && NoMaxEnchant.CONFIG.perEnchantment.containsKey(key)) {
-            return Math.min(NoMaxEnchant.CONFIG.perEnchantment.get(key), HARD_CAP);
-        }
-
-        int globalCap = NoMaxEnchant.CONFIG.globalCap;
-        if (globalCap > 0) {
-            return Math.min(globalCap, HARD_CAP);
-        }
-
-        return vanillaMax;
+        return EffectiveMaxLevel.resolve(id, vanillaMax);
     }
 
     private Identifier nomaxenchant$resolveId(Enchantment enchantment) {

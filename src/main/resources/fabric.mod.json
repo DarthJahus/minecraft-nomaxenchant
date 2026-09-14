@@ -3,12 +3,11 @@
   "id": "nomaxenchant",
   "version": "${version}",
   "name": "No Max Enchant",
-  "description": "Removes the anvil's max enchantment level clamp, letting books above the vanilla cap (e.g. Sharpness 6) apply at their real level.",
+  "description": "Removes the anvil's max enchantment level clamp, letting books above the vanilla cap (e.g. Sharpness 6) apply at their real level. Broadcasts the effective max level per enchantment over a documented network channel (nomaxenchant:effective_max_levels) that other client-side mods may optionally consume.",
   "authors": [
     "jahus"
   ],
   "license": "Apache-2.0",
-  "icon": "assets/nomaxenchant/icon.png",
   "environment": "server",
   "entrypoints": {
     "main": [
@@ -20,6 +19,7 @@
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "minecraft": "${minecraft_version}"
+    "minecraft": "${minecraft_version}",
+    "fabric-api": "*"
   }
 }
