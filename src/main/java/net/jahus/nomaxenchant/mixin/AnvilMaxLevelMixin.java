@@ -2,35 +2,27 @@ package net.jahus.nomaxenchant.mixin;
 
 import net.jahus.nomaxenchant.EffectiveMaxLevel;
 import net.jahus.nomaxenchant.NoMaxEnchant;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.screen.AnvilScreenHandler;
-import net.minecraft.screen.ForgingScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.ForgingSlotsManager;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(AnvilScreenHandler.class)
-public abstract class AnvilMaxLevelMixin extends ForgingScreenHandler {
-
-    protected AnvilMaxLevelMixin(@Nullable ScreenHandlerType<?> type, int syncId,
-                                  PlayerInventory playerInventory, ScreenHandlerContext context,
-                                  ForgingSlotsManager forgingSlotsManager) {
-        super(type, syncId, playerInventory, context, forgingSlotsManager);
-    }
+/**
+ * Redirects Enchantment#getMaxLevel() inside AnvilMenu#createResult so the
+ * anvil no longer clamps combined enchantment levels to the vanilla maximum.
+ */
+@Mixin(AnvilMenu.class)
+public abstract class AnvilMaxLevelMixin {
 
     @Redirect(
-        method = "updateResult",
+        method = "createResult",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/enchantment/Enchantment;getMaxLevel()I"
+            target = "Lnet/minecraft/world/item/enchantment/Enchantment;getMaxLevel()I"
         )
     )
     private int nomaxenchant$removeMaxLevelClamp(Enchantment enchantment) {
@@ -40,15 +32,16 @@ public abstract class AnvilMaxLevelMixin extends ForgingScreenHandler {
     }
 
     private Identifier nomaxenchant$resolveId(Enchantment enchantment) {
-        if (this.player == null || this.player.getWorld() == null) {
+        MinecraftServer server = NoMaxEnchant.server;
+        if (server == null) {
             return null;
         }
-
-        DynamicRegistryManager registryManager = this.player.getWorld().getRegistryManager();
-        if (registryManager == null) {
+        try {
+            return server.registryAccess()
+                    .lookupOrThrow(Registries.ENCHANTMENT)
+                    .getKey(enchantment);
+        } catch (Exception e) {
             return null;
         }
-
-        return registryManager.getOrThrow(RegistryKeys.ENCHANTMENT).getId(enchantment);
     }
 }

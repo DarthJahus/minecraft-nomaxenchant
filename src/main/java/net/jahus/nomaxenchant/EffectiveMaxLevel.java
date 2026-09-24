@@ -1,6 +1,6 @@
 package net.jahus.nomaxenchant;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 /**
  * Single source of truth for the effective max level nomaxenchant would
