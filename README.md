@@ -1,6 +1,9 @@
 # NoMaxEnchant
 Removes the anvil's enchantment level clamp, so combining books above the vanilla cap (e.g. Sharpness VI, Protection V) applies the enchantment at its real level instead of silently dropping back to vanilla max.
 
+[![Modrinth](https://img.shields.io/modrinth/dt/jahus-nomaxenchant?logo=modrinth&label=Modrinth)](https://modrinth.com/mod/jahus-nomaxenchant)
+[![CurseForge](https://img.shields.io/curseforge/dt/1720148?logo=curseforge&label=CurseForge)](https://www.curseforge.com/projects/1720148)
+
 ## The problem this solves
 Vanilla always clamps an enchantment's result on an anvil to its own `getMaxLevel()`, no matter what datapacks, loot table or other mods put into the book the user tries to apply. Two Sharpness V books combine into Sharpness V, even if the enchantment itself is able to go higher; the anvil throws the extra level away.
 
